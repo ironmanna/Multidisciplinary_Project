@@ -7,7 +7,7 @@ module regex_cpu_pipelined #(
     parameter  PC_WIDTH          = 9 ,
     parameter  CC_ID_BITS        = 2 ,            
     parameter  CHARACTER_WIDTH   = 8 ,
-    parameter  MEMORY_WIDTH      = 16,
+    parameter  MEMORY_WIDTH      = 20,
     parameter  MEMORY_ADDR_WIDTH = 11,
     parameter  FIFO_WIDTH_POWER_OF_2= 2    
 )(
@@ -234,6 +234,32 @@ module regex_cpu_pipelined #(
                 MATCH:
                 begin
                     if( current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] == EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] ) begin
+                        EXE1_output_pc_valid                 = 1'b1;
+                        EXE1_output_pc                       = EXE1_Pc + 1;
+						EXE1_output_cc_id 					 = EXE1_Cc_id + 1;
+                        if(~EXE1_output_pc_ready)
+                        begin
+                            EXE1_waits                       = 1'b1;
+                        end     
+                    end
+                end
+                MATCH_RANGE:
+                begin
+                    if( (current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
+                        current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= EXE1_Instr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) begin
+                        EXE1_output_pc_valid                 = 1'b1;
+                        EXE1_output_pc                       = EXE1_Pc + 1;
+						EXE1_output_cc_id 					 = EXE1_Cc_id + 1;
+                        if(~EXE1_output_pc_ready)
+                        begin
+                            EXE1_waits                       = 1'b1;
+                        end     
+                    end
+                end
+                NOT_MATCH_RANGE:
+                begin
+                    if( !(current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
+                        current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= EXE1_Instr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) begin
                         EXE1_output_pc_valid                 = 1'b1;
                         EXE1_output_pc                       = EXE1_Pc + 1;
 						EXE1_output_cc_id 					 = EXE1_Cc_id + 1;

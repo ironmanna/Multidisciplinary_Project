@@ -87,10 +87,11 @@ class re2_driver(DefaultIP):
 			tmp = int(line,16)
 			if self.verbose:
 				print(f'code line{line} converted into {tmp}')
-			assert tmp < 2**16
-			list_bytes_big_endian += tmp.to_bytes(2,'little')
+			#print('Read instruction: ',tmp,'\n','In bytes: ',tmp.to_bytes(3,'little'))
+			assert tmp < 2**20
+			list_bytes_big_endian += tmp.to_bytes(4,'little')
 		if self.verbose:
-			print(list_bytes_big_endian.hex())
+			print('List bytes: ',list_bytes_big_endian.hex())
 		return list_bytes_big_endian
 
 	
@@ -179,7 +180,7 @@ class re2_driver(DefaultIP):
 		while( status == RE2_COPROCESSOR_STATUS.RUNNING ):
 			status = self.read_status()
 			count+=1
-			if count > 100000:
+			if count > 1000000:
 				raise Exception('Error while waiting', status)
 
 
@@ -218,7 +219,7 @@ class re2_driver(DefaultIP):
 					code = f.read()
 			else:
 				import sys
-				sys.path.append('../../cicero_compiler')
+				sys.path.append('/home/xilinx/aca23Group/cicero/cicero_compiler')
 				import re2compiler
 				if self.verbose or self.debug :
 					print('start compilation')
@@ -231,7 +232,7 @@ class re2_driver(DefaultIP):
 			res  = self.load_and_run( code , string)
 			if double_check:
 				import sys
-				sys.path.append('../../cicero_compiler')
+				sys.path.append('/home/xilinx/aca23Group/cicero/cicero_compiler')
 				import golden_model
 				golden_model_res = golden_model.get_golden_model_result(regex_string, string, no_prefix=no_prefix, no_postfix=no_postfix,frontend=frontend)
 
@@ -286,7 +287,7 @@ class re2_driver(DefaultIP):
 		
 		if double_check:
 			import sys
-			sys.path.append('../../cicero_compiler')
+			sys.path.append('/home/xilinx/aca23Group/cicero/cicero_compiler')
 			import golden_model
 			golden_model_res = golden_model.get_golden_model_result(regex_string, string, no_prefix=no_prefix, no_postfix=no_postfix,frontend=frontend)
 
@@ -299,7 +300,8 @@ class re2_driver(DefaultIP):
 if __name__ == "__main__":
 	#IP_BASE_ADDRESS = 0x43C00000 or equivalently 1136656384
 	#ADDRESS_RANGE   = 6*4
-	re2_coprocessor = Overlay('../../bitstreams/4P_187_4W_B2miss.bit')
+	#re2_coprocessor = Overlay('../../bitstreams/4P_187_4W_B2miss.bit')
+	re2_coprocessor = Overlay('../../bitstreams/cicero_20.bit')
 	re2_coprocessor.re2_copro_0.debug = True
 	if re2_coprocessor.re2_copro_0.debug :
 		print('test:',re2_coprocessor.ip_dict)
@@ -337,7 +339,7 @@ if __name__ == "__main__":
 
 	#Test load code and verify that is again there when reset is sent
 	import sys
-	sys.path.append('../../cicero_compiler')
+	sys.path.append('/home/xilinx/aca23Group/cicero/cicero_compiler')
 	import re2compiler
 	code = re2compiler.compile(data=regex_string, no_prefix=False, no_postfix=False, O1=True)
 	code = code.split('\n')

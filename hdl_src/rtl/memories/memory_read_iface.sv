@@ -1,6 +1,6 @@
 interface memory_read_iface #(
     parameter MEMORY_ADDR_WIDTH = 10,
-    parameter MEMORY_WIDTH      = 32
+    parameter MEMORY_WIDTH      = 40
 );
     logic                           ready;
     logic[MEMORY_ADDR_WIDTH-1:0]    addr;

@@ -24,20 +24,23 @@ module cache_block_directly_mapped #(
   output logic                                       addr_out_valid,
   output logic [ADDR_IN_WIDTH-BLOCK_WIDTH_BITS-1:0]  addr_out,
   input  logic                                       addr_out_ready,
-  input  logic [DWIDTH*(2**BLOCK_WIDTH_BITS)-1:0]    data_in
+  input  logic [63:0]    data_in
   );
 
 localparam  CACHE_WIDTH    = 2**CACHE_WIDTH_BITS;
 localparam  BLOCK_WIDTH    = 2**BLOCK_WIDTH_BITS;
 localparam  OUT_ADDR_WIDTH = ADDR_IN_WIDTH - BLOCK_WIDTH_BITS;
 localparam  TAG_WIDTH      = ADDR_IN_WIDTH - BLOCK_WIDTH_BITS - CACHE_WIDTH_BITS ;
-localparam  RAM_WIDTH      = DWIDTH*BLOCK_WIDTH;
+//localparam  RAM_WIDTH      = DWIDTH*BLOCK_WIDTH;
+localparam  RAM_WIDTH      = 64;
 
 (* ram_style="block" *)logic      [RAM_WIDTH-1:0] content  [CACHE_WIDTH-1:0];
 
 logic [TAG_WIDTH-1:0] tag         [CACHE_WIDTH-1:0];
 logic                 is_present  [CACHE_WIDTH-1:0];
-logic [RAM_WIDTH-1:0] data_from_memory ;
+// TODO: set to 40 with extended ISA
+//logic [RAM_WIDTH-1:0] data_from_memory ;
+logic [31:0] data_from_memory ;
 
 typedef enum logic[1:0] { S_IDLE,S_FETCH, S_WRITE } State;
 State curState, nextState;
@@ -72,7 +75,9 @@ always_ff @( posedge clk ) begin
         block_sel_saved             <= block_sel_saved_next ;
         tag_saved                   <= tag_saved_next       ;
         curState                    <= nextState            ;
-        data_from_memory            <= content[cache_line_in];
+        //data_from_memory            <= content[cache_line_in];
+        data_from_memory            <= {content[cache_line_in][47 :+ 32], content[cache_line_in][15 :+ 0]};
+
         if(curState == S_FETCH)
         begin
             tag         [cache_line_saved] <= tag_saved;

@@ -4,7 +4,7 @@ module topology_token_ring #(
     parameter  LATENCY_COUNT_WIDTH      = 8 ,
     parameter  FIFO_COUNT_WIDTH         = 6 ,
     parameter  CHARACTER_WIDTH          = 8 ,
-    parameter  MEMORY_WIDTH             = 16,
+    parameter  MEMORY_WIDTH             = 20,
     parameter  MEMORY_ADDR_WIDTH        = 11,
     parameter  CACHE_WIDTH_BITS         = 0, 
     parameter  CACHE_BLOCK_WIDTH_BITS   = 2 ,

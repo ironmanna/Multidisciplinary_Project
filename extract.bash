@@ -1,5 +1,5 @@
 #!/bin/bash
-windows=(2)
+windows=(1 2 3)
 for j in ${windows[@]}
 do
 

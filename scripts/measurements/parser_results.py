@@ -5,11 +5,11 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description='CICERO output parsing script')
-parser.add_argument("-irf", "--input_res_file", help="missile fuzuca", type=str, required=True)
+parser.add_argument("-irf", "--input_res_file", help="input file name to aggregate", type=str, required=True)
 parser.add_argument("-gv", "--giovanna", help="offset a partire da dx nella riga res regex 1 per re2 0  per copro", type=int, required=True)
-parser.add_argument("-orf", "--output_res_file", help="missile fuzuca", type=str, required=True)
+parser.add_argument("-orf", "--output_res_file", help="output aggregation file name", type=str, required=True)
 parser.add_argument("-copro", "--convert_cc",action='store_true', help="convert cc into freq")
-parser.add_argument("-freq", "--target_freq", help="copro freq", type=int, default=214)
+parser.add_argument("-freq", "--target_freq", help="copro freq in MHz", type=int, default=214)
 
 args = parser.parse_args()
 
@@ -25,7 +25,6 @@ with open(args.input_res_file) as csv_file: #'measure_pcrebrill_queue_1_O1.csv')
     for row in csv_reader:
         #if line_count == 1:
             #print( row[-1] )
-            #print("missile fuzuca") 
 
         if state == 0:
             if "string:" in row[0]:
@@ -50,10 +49,8 @@ with open(args.input_res_file) as csv_file: #'measure_pcrebrill_queue_1_O1.csv')
                     if time.isdecimal() :
                         maximum_unmatched_time = float(time) if maximum_unmatched_time < float(time) else maximum_unmatched_time
                     else:
-                        print("misselfuzuca")
                         time = maximum_unmatched_time
                     time = float(time)*1000/args.target_freq
-                    #print("IL COPRO")
                 else:
                     time = float(time)
                 re_avg_list[-1].append((time, char_count if match == 'False' else char_count//2))

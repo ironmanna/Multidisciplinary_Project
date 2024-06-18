@@ -50,7 +50,7 @@ module coprocessor_top #(
     parameter  FIFO_COUNT_WIDTH      = 6 ,
     parameter  CHANNEL_COUNT_WIDTH   = 5 ,
     parameter  CHARACTER_WIDTH       = 8 ,
-    parameter  MEMORY_WIDTH          = 16,
+    parameter  MEMORY_WIDTH          = 20,
     parameter  MEMORY_ADDR_WIDTH     = 11,
     parameter  BB_N                  = 1 ,
     parameter  BB_N_X                = 0,

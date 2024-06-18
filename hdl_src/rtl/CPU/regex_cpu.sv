@@ -7,7 +7,7 @@ module regex_cpu #(
     parameter  PC_WIDTH          = 9 ,
     parameter  CC_ID_BITS        = 2 ,            
     parameter  CHARACTER_WIDTH   = 8 ,
-    parameter  MEMORY_WIDTH      = 16,
+    parameter  MEMORY_WIDTH      = 20,
     parameter  MEMORY_ADDR_WIDTH = 11
 )(
     input   wire                            clk,
@@ -119,6 +119,28 @@ module regex_cpu #(
             MATCH:
             begin
                 if( current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] == currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH]) 
+                begin
+                    output_pc_fromInstruction_valid                 = 1'b1;
+                    output_pc_fromInstruction                       = currPc + 1;
+					output_cc_id_fromInstruction 					= currCcId + 1;
+                    nextState_fromInstruction                       = S_IDLE;
+                end
+            end
+            MATCH_RANGE:
+            begin
+                if( (current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
+                    current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= currInstr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) 
+                begin
+                    output_pc_fromInstruction_valid                 = 1'b1;
+                    output_pc_fromInstruction                       = currPc + 1;
+					output_cc_id_fromInstruction 					= currCcId + 1;
+                    nextState_fromInstruction                       = S_IDLE;
+                end
+            end
+            NOT_MATCH_RANGE:
+            begin
+                if( !(current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
+                    current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= currInstr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) 
                 begin
                     output_pc_fromInstruction_valid                 = 1'b1;
                     output_pc_fromInstruction                       = currPc + 1;

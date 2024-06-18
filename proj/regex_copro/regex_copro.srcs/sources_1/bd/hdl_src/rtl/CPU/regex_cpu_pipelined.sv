@@ -6,7 +6,7 @@ import instruction::*;
 module regex_cpu_pipelined #(
     parameter  PC_WIDTH             = 8 ,
     parameter  CHARACTER_WIDTH      = 8 ,
-    parameter  MEMORY_WIDTH         = 16,
+    parameter  MEMORY_WIDTH         = 20,
     parameter  MEMORY_ADDR_WIDTH    = 11,
     parameter  FIFO_WIDTH_POWER_OF_2= 2    
 )(
