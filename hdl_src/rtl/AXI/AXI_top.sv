@@ -45,6 +45,7 @@ localparam CHANNEL_COUNT_WIDTH       = 4;
 localparam LATENCY_COUNT_WIDTH       = 7;
 localparam CACHE_WIDTH_BITS          = 4;
 localparam CACHE_BLOCK_WIDTH_BITS    = 1;
+//localparam CACHE_BLOCK_WIDTH_BITS    = 2;
 localparam BASIC_BLOCK_PIPELINED     = 1;
 localparam PC_WIDTH                  = 9;
 localparam CHARACTER_WIDTH           = 8;

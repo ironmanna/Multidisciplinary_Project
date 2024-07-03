@@ -1,5 +1,5 @@
 module arbiter_rr #(
-    parameter DWIDTH      = 16 ,
+    parameter DWIDTH      = 20 ,
     parameter PRIORITY_0  = 1
 )(
     input  logic                clk,

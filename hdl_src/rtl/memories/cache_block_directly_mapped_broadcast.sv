@@ -8,10 +8,10 @@
 //2.b otherwise memory relays memory request on addr_out using the same protocol.
 //
 module cache_block_directly_mapped_broadcast #(          
-    parameter DWIDTH                    = 4,
-    parameter CACHE_WIDTH_BITS          = 4,
-    parameter BLOCK_WIDTH_BITS          = 4,
-    parameter ADDR_IN_WIDTH             = 16
+    parameter DWIDTH                    = 5,
+    parameter CACHE_WIDTH_BITS          = 5,
+    parameter BLOCK_WIDTH_BITS          = 5,
+    parameter ADDR_IN_WIDTH             = 20
 )(
   input  logic                          clk,
   input  logic                          rst,
@@ -24,22 +24,22 @@ module cache_block_directly_mapped_broadcast #(
   output logic                                       addr_out_valid,
   output logic [ADDR_IN_WIDTH-BLOCK_WIDTH_BITS-1:0]  addr_out,
   input  logic                                       addr_out_ready,
-  input  logic [ADDR_IN_WIDTH-BLOCK_WIDTH_BITS-2:0]  addr_broadcast,
+  input  logic [ADDR_IN_WIDTH-BLOCK_WIDTH_BITS-1:0]  addr_broadcast,
   input  logic                                       addr_broadcast_valid,
-  input  logic [63:0]    data_in
+  input  logic [DWIDTH*(2**BLOCK_WIDTH_BITS)-1:0]    data_in
   );
 
 localparam  CACHE_WIDTH    = 2**CACHE_WIDTH_BITS;
 localparam  BLOCK_WIDTH    = 2**BLOCK_WIDTH_BITS;
 localparam  OUT_ADDR_WIDTH = ADDR_IN_WIDTH - BLOCK_WIDTH_BITS;
 localparam  TAG_WIDTH      = ADDR_IN_WIDTH - BLOCK_WIDTH_BITS - CACHE_WIDTH_BITS ;
-localparam  RAM_WIDTH      = 64;
+localparam  RAM_WIDTH      = DWIDTH*BLOCK_WIDTH;
 
 (* ram_style="block" *)logic      [RAM_WIDTH-1:0] content  [CACHE_WIDTH-1:0];
 
 logic [TAG_WIDTH-1:0] tag         [CACHE_WIDTH-1:0];
 logic                 is_present  [CACHE_WIDTH-1:0];
-logic [39:0] data_from_memory ;
+logic [RAM_WIDTH-1:0] data_from_memory ;
 
 typedef enum logic[2:0] { S_IDLE,S_FETCH, S_FETCH_BROADCAST } State;
 State curState, nextState;
@@ -77,7 +77,7 @@ always_ff @( posedge clk ) begin
         block_sel_saved             <= block_sel_saved_next ;
         tag_saved                   <= tag_saved_next       ;
         curState                    <= nextState            ;
-        data_from_memory            <= {content[cache_line_in][51 :+ 32], content[cache_line_in][19 :+ 0]};
+        data_from_memory            <= content[cache_line_in];
 
         if(curState == S_FETCH || curState== S_FETCH_BROADCAST)
         begin

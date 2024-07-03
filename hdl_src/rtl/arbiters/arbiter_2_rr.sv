@@ -3,7 +3,7 @@ Taken from Arbiters: Design Ideas and Coding Styles by Matt Weber
 https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.86.550&rep=rep1&type=pdf
 */
 module arbiter_2_rr #(
-    parameter DWIDTH      = 16 
+    parameter DWIDTH      = 20 
 )(
     input  logic                clk,
     input  logic                rst,

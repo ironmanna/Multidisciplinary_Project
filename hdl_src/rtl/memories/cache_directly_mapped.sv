@@ -8,7 +8,7 @@
 //2.b otherwise memory relays memory request on addr_out using the same protocol.
 //
 module cache_directly_mapped #(          
-    parameter DWIDTH                    = 16,
+    parameter DWIDTH                    = 20,
     parameter CACHE_WIDTH_BITS          = 5,
     parameter ADDR_WIDTH                = 16
 )(
