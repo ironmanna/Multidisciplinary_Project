@@ -50,15 +50,15 @@ module coprocessor_top #(
     parameter  FIFO_COUNT_WIDTH      = 6 ,
     parameter  CHANNEL_COUNT_WIDTH   = 5 ,
     parameter  CHARACTER_WIDTH       = 8 ,
-    parameter  MEMORY_WIDTH          = 20,
+    parameter  MEMORY_WIDTH          = 16,
     parameter  MEMORY_ADDR_WIDTH     = 11,
-    parameter  BB_N                  = 4 ,
+    parameter  BB_N                  = 1 ,
     parameter  BB_N_X                = 0,
     parameter  BB_N_Y                = 0,
     parameter  CACHE_WIDTH_BITS      = 5 ,
     parameter  CACHE_BLOCK_WIDTH_BITS= 2 ,
     parameter  BASIC_BLOCK_PIPELINED = 1 ,
-    parameter  REG_WIDTH             = 40,
+    parameter  REG_WIDTH             = 32,
     parameter  CONSIDER_PIPELINE_FIFO= 0,
     parameter  CC_ID_BITS            = 2
 )
@@ -81,8 +81,7 @@ module coprocessor_top #(
     output  logic                           error
 );
     localparam                       CHAR_ADDR_OFFSET = $clog2(MEMORY_WIDTH/CHARACTER_WIDTH);
-    localparam                       WINDOW_SIZE_IN_CHARS= 2**CC_ID_BITS;
-    //localparam                       WINDOW_SIZE_IN_CHARS= 2**CC_ID_BITS+1; 
+    localparam                       WINDOW_SIZE_IN_CHARS= 2**CC_ID_BITS; 
     localparam                       WINDOW_SIZE_IN_BITS= WINDOW_SIZE_IN_CHARS*CHARACTER_WIDTH;
 
     localparam [PC_WIDTH-1       :0]        start_pc               =  '0;

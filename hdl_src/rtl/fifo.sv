@@ -13,7 +13,7 @@
 //  ------
 //
 module fifo #(
-    parameter DWIDTH          = 20,
+    parameter DWIDTH          = 16,
     parameter COUNT_WIDTH     = 7
 )(
   input  logic                  clk,

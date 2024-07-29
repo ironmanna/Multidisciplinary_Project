@@ -22,9 +22,9 @@ logic rst_master;
 logic [REG_WIDTH-1:0]   status_register_next;
 
 ///// BRAM
-parameter BRAM_READ_WIDTH            = 80;
-parameter BRAM_READ_ADDR_WIDTH       = 9;
-parameter BRAM_WRITE_WIDTH           = 40;
+parameter BRAM_READ_WIDTH            = 128;
+parameter BRAM_READ_ADDR_WIDTH       = 8;
+parameter BRAM_WRITE_WIDTH           = 32;
 parameter BRAM_WRITE_ADDR_WIDTH      = 10;
 
 localparam BYTE_ADDR_OFFSET_IN_REG   =  $clog2(BRAM_READ_WIDTH/REG_WIDTH);
@@ -37,15 +37,14 @@ logic     [ BRAM_WRITE_WIDTH      -1:0 ] bram_w;
 logic                                    bram_w_valid;
 
 ///// Coprocessor
-localparam BB_N                      = 4;
+localparam BB_N                      = 1;
 localparam BB_N_X                    = 0;
 localparam BB_N_Y                    = 0;
 localparam FIFO_COUNT_WIDTH          = 5;
 localparam CHANNEL_COUNT_WIDTH       = 4;
 localparam LATENCY_COUNT_WIDTH       = 7;
 localparam CACHE_WIDTH_BITS          = 4;
-localparam CACHE_BLOCK_WIDTH_BITS    = 1;
-//localparam CACHE_BLOCK_WIDTH_BITS    = 2;
+localparam CACHE_BLOCK_WIDTH_BITS    = 2;
 localparam BASIC_BLOCK_PIPELINED     = 1;
 localparam PC_WIDTH                  = 9;
 localparam CHARACTER_WIDTH           = 8;

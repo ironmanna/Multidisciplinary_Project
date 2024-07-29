@@ -1,4 +1,3 @@
-
 //A cache to decouple memory access between different 
 //basic block. 
 //Remember that in this context none write the memory 
@@ -8,10 +7,10 @@
 //2.b otherwise memory relays memory request on addr_out using the same protocol.
 //
 module cache_block_directly_mapped_broadcast #(          
-    parameter DWIDTH                    = 5,
-    parameter CACHE_WIDTH_BITS          = 5,
-    parameter BLOCK_WIDTH_BITS          = 5,
-    parameter ADDR_IN_WIDTH             = 20
+    parameter DWIDTH                    = 4,
+    parameter CACHE_WIDTH_BITS          = 4,
+    parameter BLOCK_WIDTH_BITS          = 4,
+    parameter ADDR_IN_WIDTH             = 16
 )(
   input  logic                          clk,
   input  logic                          rst,
@@ -54,7 +53,7 @@ assign cache_line_in = addr_in[BLOCK_WIDTH_BITS+:CACHE_WIDTH_BITS];
 assign tag_in        = addr_in[ADDR_IN_WIDTH-1-:TAG_WIDTH];
 
 assign broadcast_cache_line_in = addr_broadcast[0+:CACHE_WIDTH_BITS];
-assign broadcast_tag_in        = addr_broadcast[ADDR_IN_WIDTH-BLOCK_WIDTH_BITS-2-:TAG_WIDTH];
+assign broadcast_tag_in        = addr_broadcast[ADDR_IN_WIDTH-BLOCK_WIDTH_BITS-1-:TAG_WIDTH];
 //compute hit signal
 logic                                   hit;
 assign hit           = (tag[cache_line_in] == tag_in && is_present[cache_line_in]) ;
@@ -78,7 +77,6 @@ always_ff @( posedge clk ) begin
         tag_saved                   <= tag_saved_next       ;
         curState                    <= nextState            ;
         data_from_memory            <= content[cache_line_in];
-
         if(curState == S_FETCH || curState== S_FETCH_BROADCAST)
         begin
             tag         [cache_line_saved] <= tag_saved;

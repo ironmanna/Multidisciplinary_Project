@@ -381,7 +381,7 @@ module regex_cpu_pipelined #(
     assign output_pc                        = output_pc_and_cc_id[CC_ID_BITS +:PC_WIDTH];
     assign output_cc_id				        = output_pc_and_cc_id[CC_ID_BITS-1:0];
     assign accepts =                          EXE1_accepts      || EXE2_accepts ;
-    assign running = FETCH_REC_Instr_valid || EXE1_Instr_valid  || EXE2_Instr_valid ;
+    assign running = FETCH_REC_Instr_valid || EXE1_Instr_valid  || EXE2_Instr_valid ; //il problema sta qui
 
     
 endmodule 

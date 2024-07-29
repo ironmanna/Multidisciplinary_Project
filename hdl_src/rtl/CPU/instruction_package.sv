@@ -3,7 +3,7 @@
 
     package instruction_package;
 
-        parameter INSTRUCTION_WIDTH         = 20;
+        parameter INSTRUCTION_WIDTH         = 32;
         parameter INSTRUCTION_TYPE_START    = 19;
         parameter INSTRUCTION_TYPE_END      = 16;
         parameter INSTRUCTION_TYPE_WIDTH    = (INSTRUCTION_TYPE_START-INSTRUCTION_TYPE_END)+1;

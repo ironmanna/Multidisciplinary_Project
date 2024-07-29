@@ -8,7 +8,7 @@ module regex_cpu_end_without_accepting_tb();
     parameter  PC_WIDTH          = 9;
     parameter  CC_ID_BITS        = 1;
     parameter  CHARACTER_WIDTH   = 8;
-    parameter  MEMORY_WIDTH      = 20;
+    parameter  MEMORY_WIDTH      = 16;
     parameter  MEMORY_ADDR_WIDTH = 11;
 
     logic                             clk                               ;

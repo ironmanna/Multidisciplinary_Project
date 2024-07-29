@@ -1,8 +1,8 @@
 
 module bram #(  
-        parameter READ_WIDTH            = 80,
+        parameter READ_WIDTH            = 64,
         parameter READ_ADDR_WIDTH       = 9,
-        parameter WRITE_WIDTH           = 40,
+        parameter WRITE_WIDTH           = 32,
         parameter WRITE_ADDR_WIDTH      = 10
         )
 

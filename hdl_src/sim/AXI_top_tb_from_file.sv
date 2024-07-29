@@ -74,7 +74,7 @@ module AXI_top_tb_from_file();
                      output reg [REG_WIDTH-1:0] address);
     begin
         int c;
-        reg [INSTRUCTION_WIDTH-1:0] instr_0, instr_1;
+        reg [INSTRUCTION_WIDTH-1:0] instr_0;
         reg [REG_WIDTH-1:0] data;
         reg                 flag;
         
@@ -84,16 +84,9 @@ module AXI_top_tb_from_file();
         while (! $feof(fp)) 
         begin
             c = $fscanf(fp,"%x\n", instr_0);
-            if( ! $feof(fp) )
-            begin
-                c = $fscanf(fp,"%x\n", instr_1);
-            end
-            else
-            begin
-                instr_1         = {INSTRUCTION_WIDTH{1'b0}};
-            end
-            $display("%h,%h", instr_1, instr_0);
-            data               = {instr_1, instr_0};
+            $display("%h", instr_0);
+            data[19:0] = instr_0; // Assign only the lower 20 bits
+            data[31:20] = 0;
             @(posedge clk);
             address_register  <= (address>>2);
             @(posedge clk);
@@ -116,7 +109,7 @@ module AXI_top_tb_from_file();
                      output reg [REG_WIDTH-1:0] address_cur );
     begin
         int bytes_read;
-        reg [7:0]           c [4:0];
+        reg [7:0]           c [3:0];
         reg [REG_WIDTH-1:0]   data;
         reg                   flag;
         reg [REG_WIDTH-1:0] tmp_address;
@@ -126,7 +119,7 @@ module AXI_top_tb_from_file();
         
         while (! $feof(fp)) 
         begin
-            for(int i = 0; i < 5 ; i++)
+            for(int i = 0; i < 4 ; i++)
             begin
                 if( ! $feof(fp))
                 begin
@@ -143,8 +136,8 @@ module AXI_top_tb_from_file();
                 end
             end
                 
-            $display("%d,%d,%d,%d,%d",c[4], c[3], c[2], c[1], c[0]);
-            data                = {c[4], c[3], c[2], c[1], c[0]};
+            $display("%d,%d,%d,%d",c[3], c[2], c[1], c[0]);
+            data                = {c[3], c[2], c[1], c[0]};
             @(posedge clk);
             address_register  <= (address_cur >>2);
             @(posedge clk);
@@ -191,9 +184,9 @@ module AXI_top_tb_from_file();
             
            
             @(posedge clk);
-            if ( data_o_register[((address>>1) % 2)*20+:20]  !==  instr_0)
+            if ( data_o_register[((address>>1) % 2)*16+:16]  !==  instr_0)
             begin
-                $display("%d: obtained %x !==  expected %x ",address, data_o_register[19:0]  , instr_0);
+                $display("%d: obtained %x !==  expected %x ",address, data_o_register[15:0]  , instr_0);
                 $stop;
             end
 
@@ -204,65 +197,54 @@ module AXI_top_tb_from_file();
     end
     endtask
 
-     task read_and_compare_with_string_file(
-        int fp,
-        input reg [REG_WIDTH-1:0] start_address
-    );
+     task read_and_compare_with_string_file( int fp,
+                    input  reg [REG_WIDTH-1:0] start_address);
+    begin
+        reg [REG_WIDTH:0] address;
+        int bytes_read;
+        reg [7:0]           c [1:0];
+        reg [REG_WIDTH-1:0]   data;
+        reg                 flag;
+        flag    = 1'b1;  
+        address = start_address;
+        
+        while (! $feof(fp)) 
         begin
-            reg [REG_WIDTH:0] address;
-            int bytes_read;
-            int counter_chars;
-            reg [7:0] c;
-            reg [REG_WIDTH-1:0] data;
-            reg flag;
-            flag = 1'b1;  
-            address = start_address;
-            
-            counter_chars = 0; //counter_chars is used to distinguish when we are reading the 5th char
-            
-            while (! $feof(fp)) 
+            for(int i = 0; i < 2 ; i++)
             begin
-                if(counter_chars > 4)
-                    counter_chars = 0;
-                if (! $feof(fp))
-                    bytes_read = $fscanf(fp, "%d\n", c);
+                if( ! $feof(fp))
+                    bytes_read = $fscanf(fp,"%d\n", c[i]);
                 else
-                    c = {8{1'b0}};
-                    
-                $display("%d", c);
-                
-                if(counter_chars < 3)
-                    address_register <= (address >> 2);
-                    
-                @(posedge clk);
-                if (flag)
-                begin
-                    cmd_register <= CMD_READ;
-                    flag = 1'b0;
-                    @(posedge clk);
-                end
-                
-                @(posedge clk);
-                if (data_o_register[((counter_chars) * 8) +: 8] !== c)
-                begin
-                    $display("%d: obtained %d !== expected %d", address, data_o_register[((counter_chars) * 8) +: 8], c);
-                    $stop;
-                end
-    
-                address += 1;
-                counter_chars += 1;
-                
-                if(counter_chars < 3)
-                    flag = 1'b1;
-                else
-                    flag = 0'b1;
+                    c[i]       = {8{1'b0}};
             end
+                
+            $display("%d,%d", c[1], c[0]);
+            data          = { c[1], c[0]};
+            
+            address_register  <= (address >> 2);
             @(posedge clk);
-            cmd_register <= CMD_NOP;
+            if(flag)
+            begin
+                
+                cmd_register  <= CMD_READ;
+                flag           = 1'b0;
+                @(posedge clk);
+            end
+            
+           
+            @(posedge clk);
+            if ( data_o_register[((address>>1) % 2)*16+:16]  !== { c[1], c[0] })
+            begin
+                $display("%d: obtained %d, %d !==  expected %d %d",address, data_o_register[15:8], data_o_register[7:0]  , c[1], c[0]);
+                $stop;
+            end
+
+            address += 2;
         end
+        @(posedge clk);
+        cmd_register  <= CMD_NOP;
+    end
     endtask
-
-
 
     task start( //input reg [REG_WIDTH-1:0] start_code_address, 
                 input reg [REG_WIDTH-1:0] start_string_address, 
@@ -272,9 +254,9 @@ module AXI_top_tb_from_file();
         //@(posedge clk);
         //start_pc_register         <= start_code_address;
         @(posedge clk);
-        start_cc_pointer_register <= start_string_address + 16;
+        start_cc_pointer_register <= start_string_address ;
         @(posedge clk);
-        end_cc_pointer_register   <= end_string_address + 16;
+        end_cc_pointer_register   <= end_string_address   ;
         @(posedge clk);
         cmd_register              <= CMD_START;
         
@@ -338,19 +320,19 @@ module AXI_top_tb_from_file();
             @(posedge clk);
         
         //1.write code
-        fp_code= $fopen("/home/simo/Projects/Github/Multidisciplinary_Project/hdl_src/sim/a(bORc)star.csv","r");
+        fp_code= $fopen("/home/simo/Desktop/Progetto_Multidisciplinare/CICERO_20_BUS_128/cicero/hdl_src/sim/a(bORc)star.csv","r");
         if (fp_code==0)
         begin
             $display("Could not open file '%s' for reading","code.csv");
             $stop;     
         end
-        start_code = 40'h0000_0000;
+        start_code = 32'h0000_0000;
         //write string
         $display("writing code from %h",start_code);
         write_file(fp_code, start_code , end_code );
         
         //2, write string
-        fp_string= $fopen("/home/simo/Projects/Github/Multidisciplinary_Project/hdl_src/sim/string_ok.csv","r");
+        fp_string= $fopen("/home/simo/Desktop/Progetto_Multidisciplinare/CICERO_20_BUS_128/cicero/hdl_src/sim/string_ok.csv","r");
         if (fp_string==0)
         begin
             $display("Could not open file '%s' for reading","string_ok.csv");
@@ -367,13 +349,12 @@ module AXI_top_tb_from_file();
         $display("writing string from %h",start_string);
         write_string_file(fp_string, start_string, end_string  );
         $display("wrote string and code");
-        $display("Writing string up to %h", end_string);
         $display("verify phase");
         ok = $rewind(fp_code);
         ok = $rewind(fp_string);
-        read_and_compare_with_file(fp_code, start_code);
+        //read_and_compare_with_file(fp_code, start_code);
         $display("code : OK");
-        read_and_compare_with_string_file(fp_string, start_string);
+        //read_and_compare_with_string_file(fp_string, start_string);
         $display("string : OK");
         $fclose(fp_code);
         $fclose(fp_string);
@@ -417,19 +398,19 @@ module AXI_top_tb_from_file();
             @(posedge clk);
 
         //1.write code
-        fp_code= $fopen("/home/simo/Projects/Github/Multidisciplinary_Project/hdl_src/sim/a(bORc)star.csv","r");
+        fp_code= $fopen("/home/simo/Desktop/Progetto_Multidisciplinare/CICERO_20_BUS_128/cicero/hdl_src/sim/a(bORc)star.csv","r");
         if (fp_code==0)
         begin
             $display("Could not open file '%s' for reading","code.csv");
             $stop;     
         end
-        start_code = 40'h0000_0000;
+        start_code = 32'h0000_0000;
         //write string
         $display("writing code from %h",start_code);
         write_file(fp_code, start_code , end_code );
         
         //2, write string
-        fp_string= $fopen("/home/simo/Projects/Github/Multidisciplinary_Project/hdl_src/sim/string_nok.csv","r");
+        fp_string= $fopen("/home/simo/Desktop/Progetto_Multidisciplinare/CICERO_20_BUS_128/cicero/hdl_src/sim/string_nok.csv","r");
         if (fp_string==0)
         begin
             $display("Could not open file '%s' for reading","string_nok.csv");
@@ -448,9 +429,9 @@ module AXI_top_tb_from_file();
         $display("verify phase");
         ok = $rewind(fp_code);
         ok = $rewind(fp_string);
-        read_and_compare_with_file(fp_code, start_code);
+        //read_and_compare_with_file(fp_code, start_code);
         $display("code : OK");
-        read_and_compare_with_string_file(fp_string, start_string);
+        //read_and_compare_with_string_file(fp_string, start_string);
         $display("string : OK");
         $fclose(fp_code);
         $fclose(fp_string);

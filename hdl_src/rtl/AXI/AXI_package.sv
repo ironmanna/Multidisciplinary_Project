@@ -1,7 +1,7 @@
 //contains signals used to interface regex_coprocessor
 //and software.
 package AXI_package;
-localparam REG_WIDTH                = 40;
+localparam REG_WIDTH                = 32;
 parameter  CMD_NOP                  = 'h0000_0000 ;
 parameter  CMD_WRITE                = 'h0000_0001 ;
 parameter  CMD_READ                 = 'h0000_0002 ;

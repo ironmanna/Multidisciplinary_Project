@@ -8,7 +8,7 @@ module regex_cpu_pipelined_match_pipeline_tb();
     parameter  PC_WIDTH          = 9;
     parameter  CC_ID_BITS        = 2;   
     parameter  CHARACTER_WIDTH   = 8;
-    parameter  MEMORY_WIDTH      = 20;
+    parameter  MEMORY_WIDTH      = 16;
     parameter  MEMORY_ADDR_WIDTH = 11;
 
     logic                             clk                               ;

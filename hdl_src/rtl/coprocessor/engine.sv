@@ -43,7 +43,7 @@ module engine #(
     parameter  LATENCY_COUNT_WIDTH = 8 ,
     parameter  FIFO_COUNT_WIDTH    = 6 ,
     parameter  CHARACTER_WIDTH     = 8 ,
-    parameter  MEMORY_WIDTH        = 20,
+    parameter  MEMORY_WIDTH        = 16,
     parameter  MEMORY_ADDR_WIDTH   = 11,
     parameter  CACHE_WIDTH_BITS    = 0, 
     parameter  CACHE_BLOCK_WIDTH_BITS   = 2 ,
@@ -81,7 +81,7 @@ module engine #(
     //input   logic[LATENCY_COUNT_WIDTH-1:0]  output_pc_latency
 */
 );
-    localparam I_WIDTH               = 20;
+    localparam I_WIDTH               = 32;
     localparam OFFSET_I              = $clog2(MEMORY_WIDTH/I_WIDTH);
     localparam CPU_MEMORY_ADDR_WIDTH = MEMORY_ADDR_WIDTH+OFFSET_I;
     localparam C_WINDOW_SIZE_IN_CHARS= 2**CC_ID_BITS ;
@@ -306,7 +306,7 @@ module engine #(
         //adapt memory bus to Instruction width based on previous cycle request
         always_comb
         begin
-            regex_cpu_memory_data       = memory_data[regex_cpu_memory_addr_saved[0+:OFFSET_I]*2*I_WIDTH+:I_WIDTH];
+            regex_cpu_memory_data       = memory_data[regex_cpu_memory_addr_saved[0+:OFFSET_I]*I_WIDTH+:I_WIDTH];
         end
 
         always_ff @( posedge clk ) 
