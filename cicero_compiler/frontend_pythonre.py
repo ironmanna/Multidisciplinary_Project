@@ -1,7 +1,6 @@
 import ply.yacc as yacc
 import ast_refined
 import re2lexer
-from helper import normalize_regex_input
 tokens = re2lexer.tokens
 debug  = False
 NUM_CHARS 			= 256
@@ -124,18 +123,12 @@ def p_subexpr(p):
 	elif p.slice[1].type == 'LSPAR' and p.slice[2].type == 'HAT' :
 		# negative group
 		p[0] = match_negative_group_range(p[3])
-
-		# old version
-		#p[0] = match_negative_group(p[3])
 	elif p.slice[1].type == 'LSPAR':
 		#positive group
 		p[0] = match_positive_group_range(p[2])
-
-		# old version
-		#p[0] = match_positive_group(p[2])
 	elif p.slice[1].type == 'metachar':
 		# metachar can be treated as a positive group of chars to be matched
-		p[0] = match_positive_group(p[1])
+		p[0] = match_positive_group_range(p[1])
 	elif p.slice[1].type == 'ANYCHAR':
 		#match a '.'
 		p[0] = ast_refined.any_character()
@@ -146,20 +139,6 @@ def p_subexpr(p):
 		#a terminal_sequence
 		list_of_matches = [ ast_refined.match_character(c) for c in p[1]]
 		p[0] = ast_refined.concatenation(*list_of_matches)
-
-def match_negative_group(char_set):
-	#this method decide whether to create a seq test or a parallel test
-	if len(char_set) < MAX_SEQUENTIAL_TEST: 
-		return turn_into_a_negative_match_seq(char_set)
-	else:
-		return turn_into_a_positive_match_seq(complement_char_set(char_set))
-
-def match_positive_group(char_set):
-	#this method decide whether to create a seq test or a parallel test
-	if (NUM_CHARS- len(char_set)) < MAX_SEQUENTIAL_TEST:
-		return turn_into_a_negative_match_seq(complement_char_set(char_set))
-	else:
-		return turn_into_a_positive_match_seq(char_set)
 
 def turn_into_a_negative_match_seq(char_set):
 	list_of_matches 	= [ ast_refined.match_negative_character(c) for c in char_set]
@@ -308,18 +287,19 @@ def chars_range(a, b):
 		return [b, a]
 
 def merge_ranges(char_range_list):
-	new_char_range_list = []
-	new_el = char_range_list[0]
-	for i in range(0, len(char_range_list) - 1):
-		cur = char_range_list[i]
+	# Sort the list to ensure ranges are in order
+	char_range_list.sort()
 
-		next = char_range_list[i + 1]
-		if cur[1] == next[0] - 1:
-			new_el = [new_el[0], next[1]]
+	# Initialize the merged list with the first range
+	merged_ranges = []
+	for current in char_range_list:
+		# If the merged list is empty or no overlap/adjacency, add the range
+		if not merged_ranges or current[0] > merged_ranges[-1][1] + 1:
+			merged_ranges.append(current)
 		else:
-			new_char_range_list = new_char_range_list + [new_el]
-			new_el = next
-	return new_char_range_list + [new_el]
+			# Merge the current range with the last range in merged_ranges
+			merged_ranges[-1][1] = max(merged_ranges[-1][1], current[1])
+	return merged_ranges
 
 def from_num_to_concat(n_string):
 	to_concat = []
@@ -332,14 +312,14 @@ def from_num_to_concat(n_string):
 # Error rule for syntax errors
 def p_error(p):
 	if p:
-		print(f"Syntax error at line {p.lineno} col {p.lexpos} token { p.type}")
-		line = p.lexer.lexdata.splitlines()[p.lineno-1]
-		print(line)
-		print(" "*(p.lexpos)+'^')
-		# Just discard the token and tell the parser it's okay.
-		#raise Exception(p)
+		  print(f"Syntax error at line {p.lineno} col {p.lexpos} token { p.type}")
+		  line = p.lexer.lexdata.splitlines()[p.lineno-1]
+		  print(line)
+		  print(" "*(p.lexpos)+'^')
+		  # Just discard the token and tell the parser it's okay.
+		  #raise Exception(p)
 	else:
-		print("Syntax error at EOF")
+		  print("Syntax error at EOF")
 	raise Exception("Syntax error")
 
 # Build the parser
@@ -360,6 +340,7 @@ def to_ir(data=None, no_postfix=False,no_prefix=False,dotast=None):
 	if data[-1] == '$':
 		no_postfix  = True	
 		data  		= data[:-1]
+	from helper import normalize_regex_input
 	tmp = normalize_regex_input(data)
 	ast 		= parser.parse(tmp)
 

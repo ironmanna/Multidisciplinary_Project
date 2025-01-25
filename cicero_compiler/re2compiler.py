@@ -2,13 +2,13 @@
 import importlib 
 import config
 import optimization
+import time
 
 def save_dotty(fout):
 	def save_dotty_action(x):
 		fout.write( x.dotty_str() )
 
 	return save_dotty_action
-
 
 def compile(inputfile=None,data=None, o=None, 
 			dotast=None, dotir=None, dotcode=None, 
@@ -23,6 +23,16 @@ def compile(inputfile=None,data=None, o=None,
 		with open(inputfile,'r') as f:
 			data= f.read()
 			print('read', data)
+
+			# Split the data into lines
+			lines = data.split('\n')
+        
+			# Iterate over each line
+			for line in lines:
+				# Check if the line contains the specific character
+				specific_character = "'"
+				if specific_character in line:
+					print("Line with '{}' character:", line)
 	elif data is None:
 		data 	= input('enter the regular expression> ')  
 	ir = frontend.to_ir(data=data, no_postfix=no_postfix, no_prefix=no_prefix, dotast=dotast )
@@ -53,14 +63,15 @@ def compile(inputfile=None,data=None, o=None,
 			f.write('\n}')
 
 	o_content  = backend.to_code(ir, dotcode=dotcode, o=o, O1=O1)
-
-	print(o_content)
 	
 	return o_content
 
 
 if __name__ == "__main__":
 	import argparse
+	
+	# Start timing
+	start_time = time.time_ns()
 
 	arg_parser = argparse.ArgumentParser(description='compile a regular expression into code that can be executed by re2coprocessor(https://github.com/necst/cicero).')
 	arg_parser.add_argument('inputfile'		    , type=str, help='input file containing the regular expression.'																			, default=None, nargs='?')
@@ -78,6 +89,10 @@ if __name__ == "__main__":
 	args = arg_parser.parse_args()
 	
 	compile(**args.__dict__)
+	
+	end_time = time.time_ns()
+	execution_time = end_time - start_time
+	print(f"Execution time: {execution_time} nanoseconds")
 
 	
 	

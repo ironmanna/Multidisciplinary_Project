@@ -289,9 +289,10 @@ class match_character_range(ast_refined_node):
 	def to_ir(self):
 		if self.character1 == self.character2:
 			x= ir.Match(self.character1)
+			return sub_regex(x,x)
 		else:
 			x= ir.MatchRange(self.character1, self.character2)
-		return sub_regex(x,x)
+			return sub_regex(x,x)
 class not_match_character_range(ast_refined_node):
 	def __init__(self, character1, character2):
 		super().__init__()
@@ -323,9 +324,10 @@ class not_match_character_range(ast_refined_node):
 	def to_ir(self):
 		if self.character1 == self.character2:
 			x= ir.NotMatch(self.character1)
+			return sub_regex(x,x)
 		else:
 			x= ir.NotMatchRange(self.character1, self.character2)
-		return sub_regex(x,x)
+			return sub_regex(x,x)
 
 class match_negative_character(ast_refined_node):
 	def __init__(self, character):

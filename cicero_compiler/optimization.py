@@ -166,7 +166,7 @@ def get_equivalence_classes(nodes):
 		yield equiv
 		i+=1
 
-def enhance_splits(start_node, debug=True):
+def enhance_splits(start_node, debug=False):
 	split_groups, father= get_split_groups(start_node)
 	#collect split
 	#now we can manipulate the code so that splits are arranged in a balanced tree

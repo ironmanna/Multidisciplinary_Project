@@ -144,7 +144,7 @@ module regex_cpu #(
                 begin
                     output_pc_fromInstruction_valid                 = 1'b1;
                     output_pc_fromInstruction                       = currPc + 1;
-					output_cc_id_fromInstruction 					= currCcId;
+					output_cc_id_fromInstruction 					= currCcId + 1;
                     nextState_fromInstruction                       = S_IDLE;
                 end
             end
