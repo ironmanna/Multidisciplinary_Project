@@ -1,7 +1,8 @@
 # compile verilog/system verilog design source files
-sv xil_defaultlib  \
+sv xil_defaultlib  --include "../../../../regex_copro.srcs/sources_1/bd/re2_copro/ipshared/ec67/hdl" --include "../../../../regex_copro.srcs/sources_1/bd/re2_copro/ipshared/0eaf/hdl" --include "/tools/Xilinx/Vivado/2019.2/data/xilinx_vip/include" \
 "../../../../../../hdl_src/rtl/AXI/AXI_package.sv" \
 "../../../../../../hdl_src/rtl/AXI/AXI_top.sv" \
+"../../../../../../hdl_src/rtl/CPU/instruction_package.sv" \
 "../../../../../../hdl_src/rtl/arbiters/arbiter_2_fixed.sv" \
 "../../../../../../hdl_src/rtl/arbiters/arbiter_2_rr.sv" \
 "../../../../../../hdl_src/rtl/arbiters/arbiter_fixed.sv" \
@@ -9,23 +10,19 @@ sv xil_defaultlib  \
 "../../../../../../hdl_src/rtl/arbiters/arbitration_logic_fixed.sv" \
 "../../../../../../hdl_src/rtl/arbiters/arbitration_logic_rr.sv" \
 "../../../../../../hdl_src/rtl/memories/bram.sv" \
-"../../../../../../hdl_src/rtl/memories/cache_block_directly_mapped.sv" \
-"../../../../../../hdl_src/rtl/coprocessor/channel.sv" \
+"../../../../../../hdl_src/rtl/memories/cache_block_directly_mapped_broadcast.sv" \
 "../../../../../../hdl_src/rtl/coprocessor/channel_iface.sv" \
-"../../../../../../hdl_src/rtl/coprocessor/engine.sv" \
+"../../../../../../hdl_src/rtl/coprocessor/coprocessor_package.sv" \
+"../../../../../../hdl_src/rtl/coprocessor/coprocessor_top.sv" \
 "../../../../../../hdl_src/rtl/coprocessor/engine_and_station.sv" \
 "../../../../../../hdl_src/rtl/coprocessor/engine_interfaced.sv" \
 "../../../../../../hdl_src/rtl/fifo.sv" \
-"../../../../../../hdl_src/rtl/CPU/instruction.sv" \
 "../../../../../../hdl_src/rtl/memories/memory_read_iface.sv" \
-"../../../../../../hdl_src/rtl/coprocessor/ping_pong_buffer.sv" \
-"../../../../../../hdl_src/rtl/coprocessor/regex_coprocessor_package.sv" \
-"../../../../../../hdl_src/rtl/coprocessor/regex_coprocessor_top.sv" \
-"../../../../../../hdl_src/rtl/CPU/regex_cpu.sv" \
 "../../../../../../hdl_src/rtl/CPU/regex_cpu_pipelined.sv" \
 "../../../../../../hdl_src/rtl/coprocessor/switch.sv" \
 "../../../../../../hdl_src/rtl/coprocessor/topology_single.sv" \
 "../../../../../../hdl_src/rtl/coprocessor/topology_token_ring.sv" \
+"../../../../../../hdl_src/rtl/coprocessor/vectorial_engine.sv" \
 "../../../../../../hdl_src/sim/AXI_top_tb_from_compiled.sv" \
 
 # compile glbl module

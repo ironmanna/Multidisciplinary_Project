@@ -126,6 +126,24 @@ module regex_cpu #(
                     nextState_fromInstruction                       = S_IDLE;
                 end
             end
+            NOT_MATCH:
+            begin
+                if( current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] != currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH])
+                begin
+                    output_pc_fromInstruction_valid                 = 1'b1;
+                    output_pc_fromInstruction                       = currPc + 1;
+                    output_cc_id_fromInstruction                    = currCcId ;
+                    nextState_fromInstruction                       = S_IDLE;
+                end
+            end
+            MATCH_ANY:
+            begin
+                
+                output_pc_fromInstruction_valid                 = 1'b1;
+                output_cc_id_fromInstruction = currCcId + 1;
+                nextState_fromInstruction                       = S_IDLE;
+                
+            end
             MATCH_RANGE:
             begin
                 if( (current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
@@ -147,24 +165,6 @@ module regex_cpu #(
 					output_cc_id_fromInstruction 					= currCcId;
                     nextState_fromInstruction                       = S_IDLE;
                 end
-            end
-            NOT_MATCH:
-            begin
-                if( current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] != currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH])
-                begin
-                    output_pc_fromInstruction_valid                 = 1'b1;
-                    output_pc_fromInstruction                       = currPc + 1;
-                    output_cc_id_fromInstruction                    = currCcId ;
-                    nextState_fromInstruction                       = S_IDLE;
-                end
-            end
-            MATCH_ANY:
-            begin
-                
-                output_pc_fromInstruction_valid                 = 1'b1;
-                output_cc_id_fromInstruction = currCcId + 1;
-                nextState_fromInstruction                       = S_IDLE;
-                
             end
             JMP:
             begin

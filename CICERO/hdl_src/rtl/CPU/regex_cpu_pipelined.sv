@@ -243,6 +243,30 @@ module regex_cpu_pipelined #(
                         end     
                     end
                 end
+                NOT_MATCH:
+                begin
+                    if( current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] != EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] ) begin
+                        EXE1_output_pc_valid                 = 1'b1;
+                        EXE1_output_pc                       = EXE1_Pc + 1;
+						EXE1_output_cc_id 					 = EXE1_Cc_id;
+                        if(~EXE1_output_pc_ready)
+                        begin
+                            EXE1_waits                       = 1'b1;
+                        end     
+                    end
+                end
+                MATCH_ANY:
+                begin
+                   
+                    EXE1_output_pc_valid                 = 1'b1;
+                    EXE1_output_pc                       = EXE1_Pc + 1;
+                    EXE1_output_cc_id 					 = EXE1_Cc_id + 1;
+                    if(~EXE1_output_pc_ready)
+                    begin
+                        EXE1_waits                       = 1'b1;
+                    end     
+                    
+                end
                 MATCH_RANGE:
                 begin
                     if( (current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
@@ -268,30 +292,6 @@ module regex_cpu_pipelined #(
                             EXE1_waits                       = 1'b1;
                         end     
                     end
-                end
-                NOT_MATCH:
-                begin
-                    if( current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] != EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] ) begin
-                        EXE1_output_pc_valid                 = 1'b1;
-                        EXE1_output_pc                       = EXE1_Pc + 1;
-						EXE1_output_cc_id 					 = EXE1_Cc_id;
-                        if(~EXE1_output_pc_ready)
-                        begin
-                            EXE1_waits                       = 1'b1;
-                        end     
-                    end
-                end
-                MATCH_ANY:
-                begin
-                   
-                    EXE1_output_pc_valid                 = 1'b1;
-                    EXE1_output_pc                       = EXE1_Pc + 1;
-                    EXE1_output_cc_id 					 = EXE1_Cc_id + 1;
-                    if(~EXE1_output_pc_ready)
-                    begin
-                        EXE1_waits                       = 1'b1;
-                    end     
-                    
                 end
                 JMP:
                 begin
@@ -361,18 +361,21 @@ module regex_cpu_pipelined #(
     assign EXE2_output_pc_and_cc_id   = {EXE2_output_pc, EXE2_output_cc_id				 };
     
 
-    //round robin arbiter for EXE1_output
-    arbiter_2_rr #(
+    /*
+     * Fixed arbiter to select the output of the two exe stages
+     * higher priority to EXE2 to fix a bug where EXE2 is not granted (hence stalled)
+     * hence EXE1 is then stalled too, but granted by the arbiter which means that 
+     * EXE1 is still writing its output.
+     */
+    arbiter_2_fixed #(
         .DWIDTH(PC_WIDTH+CC_ID_BITS                           )
     ) arbiter_output_pc_port (
-        .clk       ( clk                                      ),
-        .rst       ( rst                                      ),
-        .in_0_ready( EXE1_output_pc_ready                     ),
-        .in_0_data ( EXE1_output_pc_and_cc_id                 ),
-        .in_0_valid( EXE1_output_pc_valid                     ),
-        .in_1_ready( EXE2_output_pc_ready                     ),
-        .in_1_data ( EXE2_output_pc_and_cc_id                 ),
-        .in_1_valid( EXE2_output_pc_valid                     ),
+        .in_1_ready( EXE1_output_pc_ready                     ),
+        .in_1_data ( EXE1_output_pc_and_cc_id                 ),
+        .in_1_valid( EXE1_output_pc_valid                     ),
+        .in_0_ready( EXE2_output_pc_ready                     ),
+        .in_0_data ( EXE2_output_pc_and_cc_id                 ),
+        .in_0_valid( EXE2_output_pc_valid                     ),
         .out_ready ( output_pc_ready                          ),
         .out_data  ( output_pc_and_cc_id                      ),
         .out_valid ( output_pc_valid                          )
@@ -381,7 +384,7 @@ module regex_cpu_pipelined #(
     assign output_pc                        = output_pc_and_cc_id[CC_ID_BITS +:PC_WIDTH];
     assign output_cc_id				        = output_pc_and_cc_id[CC_ID_BITS-1:0];
     assign accepts =                          EXE1_accepts      || EXE2_accepts ;
-    assign running = FETCH_REC_Instr_valid || EXE1_Instr_valid  || EXE2_Instr_valid ; //il problema sta qui
+    assign running = FETCH_REC_Instr_valid || EXE1_Instr_valid  || EXE2_Instr_valid ;
 
     
 endmodule 
