@@ -269,8 +269,8 @@ module regex_cpu_pipelined #(
                 end
                 MATCH_RANGE:
                 begin
-                    if( (current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
-                        current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= EXE1_Instr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) begin
+                    if( (current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= EXE1_Instr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH] &&
+                        current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH])) begin
                         EXE1_output_pc_valid                 = 1'b1;
                         EXE1_output_pc                       = EXE1_Pc + 1;
 						EXE1_output_cc_id 					 = EXE1_Cc_id + 1;
@@ -282,8 +282,8 @@ module regex_cpu_pipelined #(
                 end
                 NOT_MATCH_RANGE:
                 begin
-                    if( !(current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
-                        current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= EXE1_Instr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) begin
+                    if( !(current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= EXE1_Instr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH] &&
+                        current_characters[EXE1_Cc_id*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= EXE1_Instr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH])) begin
                         EXE1_output_pc_valid                 = 1'b1;
                         EXE1_output_pc                       = EXE1_Pc + 1;
 						EXE1_output_cc_id 					 = EXE1_Cc_id;

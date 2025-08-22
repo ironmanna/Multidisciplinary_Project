@@ -146,8 +146,8 @@ module regex_cpu #(
             end
             MATCH_RANGE:
             begin
-                if( (current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
-                    current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= currInstr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) 
+                if( (current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= currInstr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH] &&
+                    current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH])) 
                 begin
                     output_pc_fromInstruction_valid                 = 1'b1;
                     output_pc_fromInstruction                       = currPc + 1;
@@ -157,8 +157,8 @@ module regex_cpu #(
             end
             NOT_MATCH_RANGE:
             begin
-                if( !(current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH] &&
-                    current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= currInstr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH])) 
+                if( !(current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] >= currInstr[INSTRUCTION_DATA_END+CHARACTER_WIDTH+:CHARACTER_WIDTH] &&
+                    current_characters[currCcId*CHARACTER_WIDTH+:CHARACTER_WIDTH] <= currInstr[INSTRUCTION_DATA_END+:CHARACTER_WIDTH])) 
                 begin
                     output_pc_fromInstruction_valid                 = 1'b1;
                     output_pc_fromInstruction                       = currPc + 1;
