@@ -4,10 +4,13 @@ from enum import Enum
 ESTIMATE_CODE_SIZE 		= False
 #BITS_DEDICATED_TO_TYPE 	= 3
 #BITS_DEDICATED_TO_I		= 16
-MAX_CODE_SIZE 			= 512
 BITS_DEDICATED_TO_TYPE 	= 4
 BITS_DEDICATED_TO_I		= 20
-#MAX_CODE_SIZE 			= 65536
+# Separate limits for PC and data field
+MAX_PC_SIZE 			= 512    # Limited by hardware memory (2^9 = 512 addresses: 0-511)
+MAX_DATA_SIZE 			= 65536  # Limited by data representation (16 bits for MATCH_RANGE)
+# Keep old name for backward compatibility
+MAX_CODE_SIZE 			= MAX_PC_SIZE
 
 class Re2CoproInstr_type(Enum):
 	ACCEPT 			      = 0
@@ -47,13 +50,13 @@ class Re2CoproInstr:
 		else:
 			self.data = (data1 << 8) + data2
 
-		if ESTIMATE_CODE_SIZE and self.data > MAX_CODE_SIZE or self.pc   > MAX_CODE_SIZE:
+		if ESTIMATE_CODE_SIZE and (self.data > MAX_DATA_SIZE or self.pc > MAX_PC_SIZE):
 			import warnings
 
-			warnings.warn("this code can't be executed as it possibly exceed the bits dedicated to pc", Warning)
+			warnings.warn("this code can't be executed as it possibly exceed the bits dedicated to pc or data", Warning)
 		elif not ESTIMATE_CODE_SIZE:
-			assert self.data < MAX_CODE_SIZE
-			assert self.pc   < MAX_CODE_SIZE
+			assert self.data < MAX_DATA_SIZE, f"Data value {self.data} exceeds MAX_DATA_SIZE {MAX_DATA_SIZE}"
+			assert self.pc   < MAX_PC_SIZE, f"PC value {self.pc} exceeds MAX_PC_SIZE {MAX_PC_SIZE}"
 
 	def set_pc(self,aPc):
 		self.pc = aPc
